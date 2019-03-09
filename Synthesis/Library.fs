@@ -98,19 +98,21 @@ let bizFuzz final =
     cnt 1 (0,0,0)
 
 let monthDay day year =
-    let rec myMonth d y monthCnt total=
-        let a,b = month monthCnt 
-        let total = total + b
-        match d <= 0 || y < 1581 || isLeap y = false && d>=366 with
-            | true -> failwith "Invalid day"
-            | _ -> match isLeap y = true with 
-                   |true ->  match day <= total, monthCnt = 2 with
-                             |true, _ -> a      
-                             |_, true -> myMonth day year (monthCnt + 1) (total - 1)
-                             |_, _ -> myMonth day year (monthCnt + 1) total
-                   |false -> match day <= total with
-                             |true -> a
-                             |_ -> myMonth day year (monthCnt + 1) total
-    myMonth day year 1 0 
+    let rec myMonth d monthCnt leap= 
+        let a,b = month monthCnt
+        match d <= b with
+          |true -> a
+          |false -> match leap = 1 && monthCnt = 1 with
+                    |true -> myMonth (d - b - leap) (monthCnt + 1) leap   
+                    |false -> myMonth (d - b) (monthCnt + 1) leap
+    match isLeap year with 
+        |true -> match day>= 1 && day<=366 with 
+                 |false -> failwith "Invalid day"
+                 |true -> myMonth day 1 1
+        |false-> match day>= 1 && day<=366 with 
+                 |false -> failwith "Invalid day"
+                 |true -> myMonth day 1 0
+            
+
 let coord _ =
     failwith "Not implemented"
