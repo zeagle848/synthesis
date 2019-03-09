@@ -1,5 +1,8 @@
 ﻿module Synthesis
 
+open System.Text
+open System.Text
+
 let abelar a =
     (a<3097)&&(a>12)&&(a%12=0) 
      
@@ -83,11 +86,31 @@ let toBinary num =
                     |_ -> mBin (v / 2) ("0" + bin ) 
     mBin num ""
 
-let bizFuzz _ =
-    failwith "Not implemented"
+let bizFuzz final =
+    let rec cnt n (t,f,tf) = 
+        match n > final || n<1 with
+        | true -> (t,f,tf) 
+        |_ -> match (n % 3 = 0, n % 5 = 0, (n % 3 = 0) && (n % 5 = 0) ) with
+              |true, true, true -> cnt (n + 1) (t + 1, f + 1, tf + 1)
+              |true, _, _ -> cnt (n + 1) (t + 1, f, tf)
+              |_, true, _ -> cnt (n + 1) (t, f + 1, tf)
+              |_ ,_ ,_ -> cnt (n + 1) (t, f , tf)
+    cnt 1 (0,0,0)
 
-let monthDay _ _ =
-    failwith "Not implemented"
-
+let monthDay day year =
+    let rec myMonth d y monthCnt total=
+        let a,b = month monthCnt 
+        let total = total + b
+        match d <= 0 || y < 1581 || isLeap y = false && d>=366 with
+            | true -> failwith "Invalid day"
+            | _ -> match isLeap y = true with 
+                   |true ->  match day <= total, monthCnt = 2 with
+                             |true, _ -> a      
+                             |_, true -> myMonth day year (monthCnt + 1) (total - 1)
+                             |_, _ -> myMonth day year (monthCnt + 1) total
+                   |false -> match day <= total with
+                             |true -> a
+                             |_ -> myMonth day year (monthCnt + 1) total
+    myMonth day year 1 0 
 let coord _ =
     failwith "Not implemented"
